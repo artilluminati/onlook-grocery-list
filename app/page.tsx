@@ -234,35 +234,33 @@ export default function Page() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+        <div className="min-h-screen bg-gray-900">
             {/* Header */}
             <header className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50">
-                <div className="max-w-7xl mx-auto px-6 py-5">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent flex items-center gap-3">
-                            <span className="text-2xl">🛒</span> Списки продуктов
-                        </h1>
-                        <div className="flex items-center gap-3">
-                            <input
-                                type="file"
-                                accept=".json"
-                                onChange={importFromFile}
-                                className="hidden"
-                                id="import-file"
-                            />
-                            <label
-                                htmlFor="import-file"
-                                className="px-4 py-2.5 bg-gray-800 text-gray-300 rounded-xl hover:bg-gray-700 cursor-pointer transition-all text-sm border border-gray-700 hover:border-gray-600"
-                            >
-                                📥 Импорт
-                            </label>
-                            <button
-                                onClick={() => setShowNewListModal(true)}
-                                className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
-                            >
-                                + Новый список
-                            </button>
-                        </div>
+                <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+                    <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+                        <span className="text-2xl">🛒</span> Списки продуктов
+                    </h1>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="file"
+                            accept=".json"
+                            onChange={importFromFile}
+                            className="hidden"
+                            id="import-file"
+                        />
+                        <label
+                            htmlFor="import-file"
+                            className="px-4 py-2.5 bg-gray-800 text-gray-300 rounded-xl hover:bg-gray-700 cursor-pointer transition-all text-sm border border-gray-700 hover:border-gray-600"
+                        >
+                            📥 Импорт
+                        </label>
+                        <button
+                            onClick={() => setShowNewListModal(true)}
+                            className="px-5 py-2.5 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
+                        >
+                            + Новый список
+                        </button>
                     </div>
                 </div>
             </header>
@@ -372,7 +370,7 @@ export default function Page() {
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 p-6 rounded-2xl border border-blue-600/30">
+                                        <div className="bg-blue-600/20 p-6 rounded-2xl border border-blue-600/30">
                                             <div className="text-sm text-blue-400 font-medium mb-2">
                                                 Общая стоимость
                                             </div>
@@ -380,7 +378,8 @@ export default function Page() {
                                                 {getTotalCost().toFixed(2)} ₽
                                             </div>
                                         </div>
-                                        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-6 rounded-2xl border border-green-600/30">
+
+                                        <div className="bg-green-600/20 p-6 rounded-2xl border border-green-600/30">
                                             <div className="text-sm text-green-400 font-medium mb-2">
                                                 Количество человек
                                             </div>
@@ -396,8 +395,9 @@ export default function Page() {
                                                 className="text-3xl font-bold text-white bg-transparent border-none outline-none w-full"
                                             />
                                         </div>
-                                        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-6 rounded-2xl border border-purple-600/30">
-                                            <div className="text-sm text-purple-400 font-medium mb-2">
+
+                                        <div className="bg-orange-600/20 p-6 rounded-2xl border border-orange-600/30">
+                                            <div className="text-sm text-orange-400 font-medium mb-2">
                                                 На человека
                                             </div>
                                             <div className="text-3xl font-bold text-white">
@@ -508,7 +508,7 @@ export default function Page() {
                                         <h3 className="text-xl font-semibold text-white">Товары</h3>
                                         <button
                                             onClick={addItem}
-                                            className="px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+                                            className="px-5 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
                                         >
                                             + Добавить товар
                                         </button>
@@ -674,7 +674,6 @@ export default function Page() {
                                                 </div>
                                             </div>
                                         ))}
-
                                         {currentList.items.length === 0 && (
                                             <div className="text-center py-12 text-gray-400">
                                                 <div className="text-4xl mb-4">📦</div>
@@ -699,7 +698,7 @@ export default function Page() {
                                 </div>
                                 <button
                                     onClick={() => setShowNewListModal(true)}
-                                    className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl text-lg"
+                                    className="px-8 py-4 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl text-lg font-medium"
                                 >
                                     Создать список
                                 </button>
@@ -728,7 +727,7 @@ export default function Page() {
                         <div className="flex gap-3">
                             <button
                                 onClick={createNewList}
-                                className="flex-1 px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all"
+                                className="flex-1 px-5 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all font-medium"
                             >
                                 Создать
                             </button>
