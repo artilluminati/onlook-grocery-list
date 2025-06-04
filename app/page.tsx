@@ -1,1 +1,696 @@
-'use client'; import { useState, useEffect } from 'react'; export default function Page() { const [lists, setLists] = useState([]); const [currentListId, setCurrentListId] = useState(null); const [showNewListModal, setShowNewListModal] = useState(false); const [newListName, setNewListName] = useState(''); const [peopleCount, setPeopleCount] = useState(1); const [editingListId, setEditingListId] = useState(null); const [editingListName, setEditingListName] = useState(''); // Загрузка данных из localStorage useEffect(() => { const savedLists = localStorage.getItem('cookingLists'); if (savedLists) { const parsedLists = JSON.parse(savedLists); setLists(parsedLists); if (parsedLists.length > 0) { setCurrentListId(parsedLists[0].id); } } }, []); // Сохранение в localStorage useEffect(() => { if (lists.length > 0) { localStorage.setItem('cookingLists', JSON.stringify(lists)); } }, [lists]); const currentList = lists.find((list) => list.id === currentListId); const createNewList = () => { if (!newListName.trim()) return; const newList = { id: Date.now(), name: newListName, items: [], createdAt: new Date().toISOString(), }; setLists([...lists, newList]); setCurrentListId(newList.id); setNewListName(''); setShowNewListModal(false); }; const deleteList = (listId) => { const updatedLists = lists.filter((list) => list.id !== listId); setLists(updatedLists); if (currentListId === listId) { setCurrentListId(updatedLists.length > 0 ? updatedLists[0].id : null); } }; const addItem = () => { if (!currentList) return; const newItem = { id: Date.now(), name: '', pricePerUnit: 0, quantity: 1, unit: 'шт', totalPrice: 0, }; const updatedLists = lists.map((list) => list.id === currentListId ? { ...list, items: [...list.items, newItem] } : list, ); setLists(updatedLists); }; const updateItem = (itemId, field, value) => { const updatedLists = lists.map((list) => { if (list.id !== currentListId) return list; return { ...list, items: list.items.map((item) => { if (item.id !== itemId) return item; const updatedItem = { ...item, [field]: value }; // Автоматический пересчет if (field === 'pricePerUnit' || field === 'quantity') { updatedItem.totalPrice = updatedItem.pricePerUnit * updatedItem.quantity; } else if (field === 'totalPrice') { if (updatedItem.quantity > 0) { updatedItem.pricePerUnit = updatedItem.totalPrice / updatedItem.quantity; } } return updatedItem; }), }; }); setLists(updatedLists); }; const deleteItem = (itemId) => { const updatedLists = lists.map((list) => list.id === currentListId ? { ...list, items: list.items.filter((item) => item.id !== itemId) } : list, ); setLists(updatedLists); }; const startEditingList = (listId, currentName) => { setEditingListId(listId); setEditingListName(currentName); }; const saveListName = () => { if (!editingListName.trim()) return; const updatedLists = lists.map((list) => list.id === editingListId ? { ...list, name: editingListName } : list, ); setLists(updatedLists); setEditingListId(null); setEditingListName(''); }; const cancelEditingList = () => { setEditingListId(null); setEditingListName(''); }; const scrollToItem = (itemId) => { const element = document.getElementById(`item-${itemId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Добавляем временную подсветку element.classList.add('ring-4', 'ring-blue-300', 'ring-opacity-50'); setTimeout(() => { element.classList.remove('ring-4', 'ring-blue-300', 'ring-opacity-50'); }, 2000); } }; ======= const cancelEditingList = () => { setEditingListId(null); setEditingListName(''); }; const scrollToItem = (itemId) => { const element = document.getElementById(`item-${itemId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Добавляем временную подсветку element.classList.add('ring-4', 'ring-blue-300', 'ring-opacity-50'); setTimeout(() => { element.classList.remove('ring-4', 'ring-blue-300', 'ring-opacity-50'); }, 2000); } }; const getTotalCost = () => { if (!currentList) return 0; return currentList.items.reduce((sum, item) => sum + item.totalPrice, 0); }; const getCostPerPerson = () => { return getTotalCost() / peopleCount; }; const exportToMarkdown = (forImport = false) => { if (!currentList) return; if (forImport) { // JSON формат для импорта const exportData = { name: currentList.name, items: currentList.items, exportedAt: new Date().toISOString(), }; const dataStr = JSON.stringify(exportData, null, 2); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob); const link = document.createElement('a'); link.href = url; link.download = `${currentList.name}.json`; link.click(); } else { // Markdown для шаринга let markdown = `# 🛒 ${currentList.name}\n\n`; markdown += `**Общая стоимость:** ${getTotalCost().toFixed(2)} ₽\n`; markdown += `**На ${peopleCount} чел:** ${getCostPerPerson().toFixed(2)} ₽/чел\n\n`; markdown += `## Список продуктов:\n\n`; currentList.items.forEach((item, index) => { markdown += `${index + 1}. **${item.name}**\n`; markdown += ` • ${item.quantity} ${item.unit} × ${item.pricePerUnit.toFixed(2)} ₽ = ${item.totalPrice.toFixed(2)} ₽\n\n`; }); markdown += `---\n*Создано ${new Date().toLocaleDateString('ru-RU')}*`; navigator.clipboard.writeText(markdown).then(() => { alert('Список скопирован в буфер обмена!'); }); } }; const importFromFile = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const importData = JSON.parse(e.target.result); const newList = { id: Date.now(), name: `${importData.name} (импорт)`, items: importData.items, createdAt: new Date().toISOString(), }; setLists([...lists, newList]); setCurrentListId(newList.id); alert('Список успешно импортирован!'); } catch (error) { alert('Ошибка при импорте файла'); } }; reader.readAsText(file); event.target.value = ''; }; return ( <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" data-oid="ao85ld_" > {/* Header */} <header className="bg-white shadow-sm border-b" data-oid="o_telh3"> <div className="max-w-6xl mx-auto px-4 py-4" data-oid="t2gy1mc"> <div className="flex items-center justify-between" data-oid="-hv9k4f"> <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2" data-oid="7nq9vys" > 🛒 Списки продуктов </h1> <div className="flex items-center gap-3 h-full" data-oid="bba0zr:"> <input type="file" accept=".json" onChange={importFromFile} className="hidden" id="import-file" data-oid="57-:lhd" /> <label htmlFor="import-file" className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors flex justify-center items-center text-[10px] h-[42px]" data-oid="z1t.r5-" > 📥 </label> <button onClick={() => setShowNewListModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-[fit-content] text-[16px]" data-oid="8knq:bz" > + </button> </div> </div> </div> </header> <div className="max-w-7xl mx-auto px-6 py-8" data-oid="cui6pwf"> <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" data-oid=":bk5tf-"> {/* Sidebar с списками */} <div className="lg:col-span-1" data-oid="l6yi387"> <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-6" data-oid="occh4o_"> <h3 className="font-semibold text-white mb-4 text-lg" data-oid="x7u477y"> Мои списки </h3> <div className="space-y-3" data-oid="32ooj5g"> {lists.map((list) => ( <div key={list.id} className={`p-4 rounded-xl cursor-pointer transition-all ${ currentListId === list.id ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/50 shadow-lg' : 'bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/30' }`} onClick={() => setCurrentListId(list.id)} data-oid="2-:.apo" > <div className="flex items-center justify-between" data-oid="0iefq69" > <span className="font-medium text-white" data-oid="m_i2mjv" > {list.name} </span> <button onClick={(e) => { e.stopPropagation(); deleteList(list.id); }} className="text-red-400 hover:text-red-300 transition-colors" data-oid="jxbktjr" > ✕ </button> </div> <div className="text-sm text-gray-400 mt-2" data-oid="wjrvtd2" > {list.items.length} товаров </div> </div> ))} </div> </div> </div> {/* Основной контент */} <div className="lg:col-span-3" data-oid="l_p76zd"> {currentList ? ( <div className="space-y-6" data-oid="tnihgt6"> {/* Заголовок списка и статистика */} <div className="bg-white rounded-xl shadow-sm p-6" data-oid="6yi8qk8" > <div className="flex items-center justify-between mb-4 flex-col gap-[12px]" data-oid="svrlkm9" > {editingListId === currentList.id ? ( <div className="flex items-center gap-2" data-oid="tu9cpoc" > <input type="text" value={editingListName} onChange={(e) => setEditingListName(e.target.value) } onKeyPress={(e) => e.key === 'Enter' && saveListName() } className="text-xl font-bold text-gray-800 bg-transparent border-b-2 border-blue-500 outline-none" autoFocus data-oid="yye4btl" /> <button onClick={saveListName} className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200" data-oid="gz6isbx" > ✓ </button> <button onClick={cancelEditingList} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200" data-oid="soob-ml" > ✕ </button> </div> ) : ( <h2 className="text-xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors w-full" onClick={() => startEditingList( currentList.id, currentList.name, ) } title="Нажмите для редактирования" data-oid="lt8muev" > {currentList.name} ✏️ </h2> )} <div className="flex items-center gap-3 w-full" data-oid="7z:lxpe" key="olk-UnJR" > <button onClick={() => exportToMarkdown(true)} className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm flex" data-oid="xdlw1ao" key="olk--e-X" > 📤 </button> <button onClick={() => exportToMarkdown(false)} className="px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm flex justify-center w-[fit-content]" data-oid="_5:1qe1" key="olk-itPi" > 📋 </button> </div> </div<div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-oid="qt7jz70" > <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 p-6 rounded-2xl border border-blue-600/30" data-oid="w53fokd" > <div className="text-sm text-blue-400 font-medium mb-2" data-oid="u:x.x0y" > Общая стоимость </div> <div className="text-3xl font-bold text-white" data-oid="mtgnh.v" > {getTotalCost().toFixed(2)} ₽ </div> </div> <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-6 rounded-2xl border border-green-600/30" data-oid="j469fhw" > <div className="text-sm text-green-400 font-medium mb-2" data-oid="da2o59l" > Количество человек </div> <input type="number" min="1" value={peopleCount} onChange={(e) => setPeopleCount( Math.max(1, parseInt(e.target.value) || 1), ) } className="text-3xl font-bold text-white bg-transparent border-none outline-none w-full" data-oid="q3qsbvb" /> </div> <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-6 rounded-2xl border border-purple-600/30" data-oid="imo:n3c" > <div className="text-sm text-purple-400 font-medium mb-2" data-oid="ma:piyh" > На человека </div> <div className="text-3xl font-bold text-white" data-oid="l7fgm95" > {getCostPerPerson().toFixed(2)} ₽ </div> </div> </div> </div{/* Краткий предпросмотр списка */} {currentList.items.length > 0 && ( <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8"> <div className="flex items-center justify-between mb-6"> <h3 className="text-xl font-semibold text-white"> 📋 Краткий список </h3> <div className="text-sm text-gray-400"> {currentList.items.length} товаров </div> </div> <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {currentList.items.map((item, index) => ( <div key={item.id} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl hover:bg-gray-700/50 transition-all cursor-pointer group border border-gray-600/30" onClick={() => scrollToItem(item.id)} > <div className="flex-1 min-w-0"> <div className="flex items-center gap-2"> <span className="text-xs text-gray-500 font-medium"> {index + 1}. </span> <span className="font-medium text-white truncate"> {item.name || 'Без названия'} </span> </div> <div className="text-sm text-gray-400 mt-1"> {item.quantity > 0 && item.pricePerUnit > 0 ? ( <span> {item.quantity} {item.unit} × {item.pricePerUnit.toFixed(2)} ₽ </span> ) : ( <span className="text-gray-500 italic"> Не заполнено </span> )} </div> </div> <div className="flex items-center gap-2"> <div className="text-right"> <div className="font-semibold text-white"> {item.totalPrice.toFixed(2)} ₽ </div> </div> <div className="opacity-0 group-hover:opacity-100 transition-opacity"> <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /> </svg> </div> </div> </div> ))} </div> <div className="mt-6 pt-6 border-t border-gray-700/50"> <div className="flex justify-between items-center text-sm"> <span className="text-gray-400"> Нажмите на товар для редактирования </span> <div className="flex items-center gap-4"> <span className="text-gray-400"> Заполнено: {currentList.items.filter(item => item.name && item.quantity > 0 && item.pricePerUnit > 0).length} из {currentList.items.length} </span> <span className="font-semibold text-white"> Итого: {getTotalCost().toFixed(2)} ₽ </span> </div> </div> </div> </div> )} {/* Список товаров */} <div className="bg-white rounded-xl shadow-sm p-6" data-oid=":w-lf1j" > <div className="items-center justify-between mb-4 flex flex-col gap-[16px]" data-oid="s3vhu8h" > <h3 className="text-lg font-semibold text-gray-800" data-oid="0r844:0" > Продукты </h3> <button onClick={addItem} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full" data-oid="9g7cp54" > + Добавить продукт </button> </div> <div className="space-y-4" data-oid="c4gf9b5"{currentList.items.map((item) => ( <div key={item.id} id={`item-${item.id}`} className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all bg-gray-50 scroll-mt-4" data-oid="9jgv0d5" > <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end" data-oid="8txpx3n" > {/* Название товара */} <div className="lg:col-span-4" data-oid="vvm3c.k" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="q.dd6s2" > Название товара </label> <input type="text" placeholder="Введите название" value={item.name} onChange={(e) => updateItem( item.id, 'name', e.target.value, ) } className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white" data-oid="r0in19x" /> </div> {/* Цена за единицу */} <div className="lg:col-span-2" data-oid="4ga8lnk" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="z9.87gp" > Цена за ед. </label> <div className="relative" data-oid="ubczhiq" > <input type="number" step="0.01" min="0" placeholder="0.00" value={item.pricePerUnit || ''} onChange={(e) => updateItem( item.id, 'pricePerUnit', parseFloat( e.target.value, ) || 0, ) } className="w-full px-3 py-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white" data-oid="qnustvd" /> <span className="absolute right-3 top-2.5 text-gray-500 text-sm" data-oid="7qcw7x6" > ₽ </span> </div> </div> {/* Количество и единица измерения */} <div className="lg:col-span-3" data-oid="gj:_17a" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="aze7q_e" > Количество </label> <div className="flex gap-2" data-oid=".kj_u9-" > <input type="number" step={ item.unit === 'шт' || item.unit === 'упак' ? '1' : '0.5' } min="0" placeholder="0" value={item.quantity || ''} onChange={(e) => updateItem( item.id, 'quantity', parseFloat( e.target.value, ) || 0, ) } className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white w-[102px]" data-oid=":ow.-9t" /> <select value={item.unit} onChange={(e) => updateItem( item.id, 'unit', e.target.value, ) } className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white min-w-[70px]" data-oid="mclz28t" > <option value="шт" data-oid="-1vgoxw" > шт </option> <option value="кг" data-oid="vgo634c" > кг </option> <option value="л" data-oid="mcwjc5r" > л </option> <option value="упак" data-oid="_yjsx84" > упак </option> </select> </div> </div> {/* Общая стоимость */} <div className="lg:col-span-2" data-oid="tcjbbzl" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="egff78n" > Общая стоимость </label> <div className="relative" data-oid="-4gq4ei" > <input type="number" step="0.01" min="0" placeholder="0.00" value={item.totalPrice || ''} onChange={(e) => updateItem( item.id, 'totalPrice', parseFloat( e.target.value, ) || 0, ) } className="w-full px-3 py-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white font-medium" data-oid="iz9qeq9" /> <span className="absolute right-3 top-2.5 text-gray-500 text-sm" data-oid="mx5qjmu" > ₽ </span> </div> </div> {/* Кнопка удаления */} <div className="lg:col-span-1" data-oid="12u8bi5" > <button onClick={() => deleteItem(item.id)} className="w-full px-3 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center" title="Удалить товар" data-oid="mhq8hmp" > 🗑️ </button> </div> </div> {/* Мобильная версия - показываем расчет */} <div className="lg:hidden mt-3 pt-3 border-t border-gray-200" data-oid="6y5l2:s" > <div className="text-sm text-gray-600" data-oid="j5i2.ft" > {item.quantity > 0 && item.pricePerUnit > 0 && ( <span data-oid="vlyx5ox"> {item.quantity} {item.unit} ×{' '} {item.pricePerUnit.toFixed(2)} ₽ = {item.totalPrice.toFixed(2)} ₽ </span> )} </div> </div> </div> ))} {currentList.items.length === 0 && ( <div className="text-center py-8 text-gray-500" data-oid="4gktaz-" > Список пуст. Добавьте первый товар! </div> )} </div> </div> </div) : ( <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-16 text-center" data-oid="izmwqbc" > <div className="text-gray-400 mb-8" data-oid=":1y-y56"> <div className="text-6xl mb-4" data-oid="czpbbur"> 📝 </div> <div className="text-xl text-white mb-2" data-oid=".e626yo"> Создайте свой первый список продуктов </div> <div className="text-gray-400"> Начните планировать покупки с умом </div> </div> <button onClick={() => setShowNewListModal(true)} className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl text-lg" data-oid="4lya6jk" > Создать список </button> </div> )} </div> </div> </div{/* Модальное окно создания списка */} {showNewListModal && ( <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" data-oid="yavx3aq" > <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-md mx-4 border border-gray-700/50" data-oid="u24qaxk" > <h3 className="text-xl font-semibold mb-6 text-white" data-oid="gayllxa"> Создать новый список </h3> <input type="text" placeholder="Название списка" value={newListName} onChange={(e) => setNewListName(e.target.value)} className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-6 bg-gray-700/50 text-white placeholder-gray-400 transition-all" onKeyPress={(e) => e.key === 'Enter' && createNewList()} data-oid=":6ahz:c" autoFocus /> <div className="flex gap-3" data-oid="1jws8uh"> <button onClick={createNewList} className="flex-1 px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all" data-oid="nob.r__" > Создать </button> <button onClick={() => { setShowNewListModal(false); setNewListName(''); }} className="flex-1 px-5 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-all" data-oid="5x1aqxj" > Отмена </button> </div> </div> </div> )} </div> ); }
+'use client';
+
+import { useState, useEffect } from 'react';
+
+export default function Page() {
+
+
+    const [lists, setLists] = useState([]);
+    const [currentListId, setCurrentListId] = useState(null);
+    const [showNewListModal, setShowNewListModal] = useState(false);
+    const [newListName, setNewListName] = useState('');
+    const [peopleCount, setPeopleCount] = useState(1);
+    const [editingListId, setEditingListId] = useState(null);
+    const [editingListName, setEditingListName] = useState('');
+
+    const cancelEditingList = () => { setEditingListId(null); setEditingListName(''); };
+ const scrollToItem = (itemId) => { const element = document.getElementById(`item-${itemId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Добавляем временную подсветку
+element.classList.add('ring-4', 'ring-blue-300', 'ring-opacity-50'); setTimeout(() => { element.classList.remove('ring-4', 'ring-blue-300', 'ring-opacity-50'); }, 2000); } }; const getTotalCost = () => { if (!currentList) return 0; return currentList.items.reduce((sum, item) => sum + item.totalPrice, 0); }; const getCostPerPerson = () => { return getTotalCost() / peopleCount; }; const exportToMarkdown = (forImport = false) => { if (!currentList) return; if (forImport) { // JSON формат для импорта const exportData = { name: currentList.name, items: currentList.items, exportedAt: new Date().toISOString(), }; const dataStr = JSON.stringify(exportData, null, 2); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob); const link = document.createElement('a'); link.href = url; link.download = `${currentList.name}.json`; link.click(); } else { // Markdown для шаринга let markdown = `# 🛒 ${currentList.name}\n\n`; markdown += `**Общая стоимость:** ${getTotalCost().toFixed(2)} ₽\n`; markdown += `**На ${peopleCount} чел:** ${getCostPerPerson().toFixed(2)} ₽/чел\n\n`; markdown += `## Список продуктов:\n\n`; currentList.items.forEach((item, index) => { markdown += `${index + 1}. **${item.name}**\n`; markdown += ` • ${item.quantity} ${item.unit} × ${item.pricePerUnit.toFixed(2)} ₽ = ${item.totalPrice.toFixed(2)} ₽\n\n`; }); markdown += `---\n*Создано ${new Date().toLocaleDateString('ru-RU')}*`; navigator.clipboard.writeText(markdown).then(() => { alert('Список скопирован в буфер обмена!'); }); } }; const importFromFile = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const importData = JSON.parse(e.target.result); const newList = { id: Date.now(), name: `${importData.name} (импорт)`, items: importData.items, createdAt: new Date().toISOString(), }; setLists([...lists, newList]); setCurrentListId(newList.id); alert('Список успешно импортирован!'); } catch (error) { alert('Ошибка при импорте файла'); } }; reader.readAsText(file); event.target.value = ''; }; return ( <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" data-oid="ao85ld_" > {/* Header */} <header className="bg-white shadow-sm border-b" data-oid="o_telh3"> <div className="max-w-6xl mx-auto px-4 py-4" data-oid="t2gy1mc"> <div className="flex items-center justify-between" data-oid="-hv9k4f"> <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2" data-oid="7nq9vys" > 🛒 Списки продуктов </h1> <div className="flex items-center gap-3 h-full" data-oid="bba0zr:"> <input type="file" accept=".json" onChange={importFromFile} className="hidden" id="import-file" data-oid="57-:lhd" /> <label htmlFor="import-file" className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors flex justify-center items-center text-[10px] h-[42px]" data-oid="z1t.r5-" > 📥 </label> <button onClick={() => setShowNewListModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-[fit-content] text-[16px]" data-oid="8knq:bz" > + </button> </div> </div> </div> </header> <div className="max-w-7xl mx-auto px-6 py-8" data-oid="cui6pwf"> <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" data-oid=":bk5tf-"> {/* Sidebar с списками */} <div className="lg:col-span-1" data-oid="l6yi387"> <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-6" data-oid="occh4o_"> <h3 className="font-semibold text-white mb-4 text-lg" data-oid="x7u477y"> Мои списки </h3> <div className="space-y-3" data-oid="32ooj5g"> {lists.map((list) => ( <div key={list.id} className={`p-4 rounded-xl cursor-pointer transition-all ${ currentListId === list.id ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/50 shadow-lg' : 'bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/30' }`} onClick={() => setCurrentListId(list.id)} data-oid="2-:.apo" > <div className="flex items-center justify-between" data-oid="0iefq69" > <span className="font-medium text-white" data-oid="m_i2mjv" > {list.name} </span> <button onClick={(e) => { e.stopPropagation(); deleteList(list.id); }} className="text-red-400 hover:text-red-300 transition-colors" data-oid="jxbktjr" > ✕ </button> </div> <div className="text-sm text-gray-400 mt-2" data-oid="wjrvtd2" > {list.items.length} товаров </div> </div> ))} </div> </div> </div> {/* Основной контент */} <div className="lg:col-span-3" data-oid="l_p76zd"> {currentList ? ( <div className="space-y-6" data-oid="tnihgt6"> {/* Заголовок списка и статистика */} <div className="bg-white rounded-xl shadow-sm p-6" data-oid="6yi8qk8" > <div className="flex items-center justify-between mb-4 flex-col gap-[12px]" data-oid="svrlkm9" > {editingListId === currentList.id ? ( <div className="flex items-center gap-2" data-oid="tu9cpoc" > <input type="text" value={editingListName} onChange={(e) => setEditingListName(e.target.value) } onKeyPress={(e) => e.key === 'Enter' && saveListName() } className="text-xl font-bold text-gray-800 bg-transparent border-b-2 border-blue-500 outline-none" autoFocus data-oid="yye4btl" /> <button onClick={saveListName} className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200" data-oid="gz6isbx" > ✓ </button> <button onClick={cancelEditingList} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200" data-oid="soob-ml" > ✕ </button> </div> ) : ( <h2 className="text-xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors w-full" onClick={() => startEditingList( currentList.id, currentList.name, ) } title="Нажмите для редактирования" data-oid="lt8muev" > {currentList.name} ✏️ </h2> )} <div className="flex items-center gap-3 w-full" data-oid="7z:lxpe" key="olk-UnJR" > <button onClick={() => exportToMarkdown(true)} className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm flex" data-oid="xdlw1ao" key="olk--e-X" > 📤 </button> <button onClick={() => exportToMarkdown(false)} className="px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm flex justify-center w-[fit-content]" data-oid="_5:1qe1" key="olk-itPi" > 📋 </button> </div> </div<div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-oid="qt7jz70" > <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 p-6 rounded-2xl border border-blue-600/30" data-oid="w53fokd" > <div className="text-sm text-blue-400 font-medium mb-2" data-oid="u:x.x0y" > Общая стоимость </div> <div className="text-3xl font-bold text-white" data-oid="mtgnh.v" > {getTotalCost().toFixed(2)} ₽ </div> </div> <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-6 rounded-2xl border border-green-600/30" data-oid="j469fhw" > <div className="text-sm text-green-400 font-medium mb-2" data-oid="da2o59l" > Количество человек </div> <input type="number" min="1" value={peopleCount} onChange={(e) => setPeopleCount( Math.max(1, parseInt(e.target.value) || 1), ) } className="text-3xl font-bold text-white bg-transparent border-none outline-none w-full" data-oid="q3qsbvb" /> </div> <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-6 rounded-2xl border border-purple-600/30" data-oid="imo:n3c" > <div className="text-sm text-purple-400 font-medium mb-2" data-oid="ma:piyh" > На человека </div> <div className="text-3xl font-bold text-white" data-oid="l7fgm95" > {getCostPerPerson().toFixed(2)} ₽ </div> </div> </div> </div{/* Краткий предпросмотр списка */} {currentList.items.length > 0 && ( <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8"> <div className="flex items-center justify-between mb-6"> <h3 className="text-xl font-semibold text-white"> 📋 Краткий список </h3> <div className="text-sm text-gray-400"> {currentList.items.length} товаров </div> </div> <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {currentList.items.map((item, index) => ( <div key={item.id} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl hover:bg-gray-700/50 transition-all cursor-pointer group border border-gray-600/30" onClick={() => scrollToItem(item.id)} > <div className="flex-1 min-w-0"> <div className="flex items-center gap-2"> <span className="text-xs text-gray-500 font-medium"> {index + 1}. </span> <span className="font-medium text-white truncate"> {item.name || 'Без названия'} </span> </div> <div className="text-sm text-gray-400 mt-1"> {item.quantity > 0 && item.pricePerUnit > 0 ? ( <span> {item.quantity} {item.unit} × {item.pricePerUnit.toFixed(2)} ₽ </span> ) : ( <span className="text-gray-500 italic"> Не заполнено </span> )} </div> </div> <div className="flex items-center gap-2"> <div className="text-right"> <div className="font-semibold text-white"> {item.totalPrice.toFixed(2)} ₽ </div> </div> <div className="opacity-0 group-hover:opacity-100 transition-opacity"> <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /> </svg> </div> </div> </div> ))} </div> <div className="mt-6 pt-6 border-t border-gray-700/50"> <div className="flex justify-between items-center text-sm"> <span className="text-gray-400"> Нажмите на товар для редактирования </span> <div className="flex items-center gap-4"> <span className="text-gray-400"> Заполнено: {currentList.items.filter(item => item.name && item.quantity > 0 && item.pricePerUnit > 0).length} из {currentList.items.length} </span> <span className="font-semibold text-white"> Итого: {getTotalCost().toFixed(2)} ₽ </span> </div> </div> </div> </div> )} {/* Список товаров */} <div className="bg-white rounded-xl shadow-sm p-6" data-oid=":w-lf1j" > <div className="items-center justify-between mb-4 flex flex-col gap-[16px]" data-oid="s3vhu8h" > <h3 className="text-lg font-semibold text-gray-800" data-oid="0r844:0" > Продукты </h3> <button onClick={addItem} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full" data-oid="9g7cp54" > + Добавить продукт </button> </div> <div className="space-y-4" data-oid="c4gf9b5"{currentList.items.map((item) => ( <div key={item.id} id={`item-${item.id}`} className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all bg-gray-50 scroll-mt-4" data-oid="9jgv0d5" > <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end" data-oid="8txpx3n" > {/* Название товара */} <div className="lg:col-span-4" data-oid="vvm3c.k" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="q.dd6s2" > Название товара </label> <input type="text" placeholder="Введите название" value={item.name} onChange={(e) => updateItem( item.id, 'name', e.target.value, ) } className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white" data-oid="r0in19x" /> </div> {/* Цена за единицу */} <div className="lg:col-span-2" data-oid="4ga8lnk" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="z9.87gp" > Цена за ед. </label> <div className="relative" data-oid="ubczhiq" > <input type="number" step="0.01" min="0" placeholder="0.00" value={item.pricePerUnit || ''} onChange={(e) => updateItem( item.id, 'pricePerUnit', parseFloat( e.target.value, ) || 0, ) } className="w-full px-3 py-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white" data-oid="qnustvd" /> <span className="absolute right-3 top-2.5 text-gray-500 text-sm" data-oid="7qcw7x6" > ₽ </span> </div> </div> {/* Количество и единица измерения */} <div className="lg:col-span-3" data-oid="gj:_17a" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="aze7q_e" > Количество </label> <div className="flex gap-2" data-oid=".kj_u9-" > <input type="number" step={ item.unit === 'шт' || item.unit === 'упак' ? '1' : '0.5' } min="0" placeholder="0" value={item.quantity || ''} onChange={(e) => updateItem( item.id, 'quantity', parseFloat( e.target.value, ) || 0, ) } className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white w-[102px]" data-oid=":ow.-9t" /> <select value={item.unit} onChange={(e) => updateItem( item.id, 'unit', e.target.value, ) } className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white min-w-[70px]" data-oid="mclz28t" > <option value="шт" data-oid="-1vgoxw" > шт </option> <option value="кг" data-oid="vgo634c" > кг </option> <option value="л" data-oid="mcwjc5r" > л </option> <option value="упак" data-oid="_yjsx84" > упак </option> </select> </div> </div> {/* Общая стоимость */} <div className="lg:col-span-2" data-oid="tcjbbzl" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="egff78n" > Общая стоимость </label> <div className="relative" data-oid="-4gq4ei" > <input type="number" step="0.01" min="0" placeholder="0.00" value={item.totalPrice || ''} onChange={(e) => updateItem( item.id, 'totalPrice', parseFloat( e.target.value, ) || 0, ) } className="w-full px-3 py-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white font-medium" data-oid="iz9qeq9" /> <span className="absolute right-3 top-2.5 text-gray-500 text-sm" data-oid="mx5qjmu" > ₽ </span> </div> </div> {/* Кнопка удаления */} <div className="lg:col-span-1" data-oid="12u8bi5" > <button onClick={() => deleteItem(item.id)} className="w-full px-3 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center" title="Удалить товар" data-oid="mhq8hmp" > 🗑️ </button> </div> </div> {/* Мобильная версия - показываем расчет */} <div className="lg:hidden mt-3 pt-3 border-t border-gray-200" data-oid="6y5l2:s" > <div className="text-sm text-gray-600" data-oid="j5i2.ft" > {item.quantity > 0 && item.pricePerUnit > 0 && ( <span data-oid="vlyx5ox"> {item.quantity} {item.unit} ×{' '} {item.pricePerUnit.toFixed(2)} ₽ = {item.totalPrice.toFixed(2)} ₽ </span> )} </div> </div> </div> ))} {currentList.items.length === 0 && ( <div className="text-center py-8 text-gray-500" data-oid="4gktaz-" > Список пуст. Добавьте первый товар! </div> )} </div> </div> </div) : ( <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-16 text-center" data-oid="izmwqbc" > <div className="text-gray-400 mb-8" data-oid=":1y-y56"> <div className="text-6xl mb-4" data-oid="czpbbur"> 📝 </div> <div className="text-xl text-white mb-2" data-oid=".e626yo"> Создайте свой первый список продуктов </div> <div className="text-gray-400"> Начните планировать покупки с умом </div> </div> <button onClick={() => setShowNewListModal(true)} className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl text-lg" data-oid="4lya6jk" > Создать список </button> </div> )} </div> </div> </div{/* Модальное окно создания списка */} {showNewListModal && ( <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" data-oid="yavx3aq" > <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-md mx-4 border border-gray-700/50" data-oid="u24qaxk" > <h3 className="text-xl font-semibold mb-6 text-white" data-oid="gayllxa"> Создать новый список </h3> <input type="text" placeholder="Название списка" value={newListName} onChange={(e) => setNewListName(e.target.value)} className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-6 bg-gray-700/50 text-white placeholder-gray-400 transition-all" onKeyPress={(e) => e.key === 'Enter' && createNewList()} data-oid=":6ahz:c" autoFocus /> <div className="flex gap-3" data-oid="1jws8uh"> <button onClick={createNewList} className="flex-1 px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all" data-oid="nob.r__" > Создать </button> <button onClick={() => { setShowNewListModal(false); setNewListName(''); }} className="flex-1 px-5 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-all" data-oid="5x1aqxj" > Отмена </button> </div> </div> </div> )} </div> ); }
+
+    // Загрузка данных из localStorage
+    useEffect(() => {
+        const savedLists = localStorage.getItem('cookingLists');
+        if (savedLists) {
+            const parsedLists = JSON.parse(savedLists);
+            setLists(parsedLists);
+            if (parsedLists.length > 0) {
+                setCurrentListId(parsedLists[0].id);
+            }
+        }
+    }, []);
+
+    // Сохранение в localStorage
+    useEffect(() => {
+        if (lists.length > 0) {
+            localStorage.setItem('cookingLists', JSON.stringify(lists));
+        }
+    }, [lists]);
+
+    const currentList = lists.find((list) => list.id === currentListId);
+
+    const createNewList = () => {
+        if (!newListName.trim()) return;
+
+        const newList = {
+            id: Date.now(),
+            name: newListName,
+            items: [],
+            createdAt: new Date().toISOString(),
+        };
+
+        setLists([...lists, newList]);
+        setCurrentListId(newList.id);
+        setNewListName('');
+        setShowNewListModal(false);
+    };
+
+    const deleteList = (listId) => {
+        const updatedLists = lists.filter((list) => list.id !== listId);
+        setLists(updatedLists);
+        if (currentListId === listId) {
+            setCurrentListId(updatedLists.length > 0 ? updatedLists[0].id : null);
+        }
+    };
+
+    const addItem = () => {
+        if (!currentList) return;
+
+        const newItem = {
+            id: Date.now(),
+            name: '',
+            pricePerUnit: 0,
+            quantity: 1,
+            unit: 'шт',
+            totalPrice: 0,
+        };
+
+        const updatedLists = lists.map((list) =>
+            list.id === currentListId ? { ...list, items: [...list.items, newItem] } : list,
+        );
+        setLists(updatedLists);
+    };
+
+    const updateItem = (itemId, field, value) => {
+        const updatedLists = lists.map((list) => {
+            if (list.id !== currentListId) return list;
+
+            return {
+                ...list,
+                items: list.items.map((item) => {
+                    if (item.id !== itemId) return item;
+
+                    const updatedItem = { ...item, [field]: value };
+
+                    // Автоматический пересчет
+                    if (field === 'pricePerUnit' || field === 'quantity') {
+                        updatedItem.totalPrice = updatedItem.pricePerUnit * updatedItem.quantity;
+                    } else if (field === 'totalPrice') {
+                        if (updatedItem.quantity > 0) {
+                            updatedItem.pricePerUnit =
+                                updatedItem.totalPrice / updatedItem.quantity;
+                        }
+                    }
+
+                    return updatedItem;
+                }),
+            };
+        });
+        setLists(updatedLists);
+    };
+
+    const deleteItem = (itemId) => {
+        const updatedLists = lists.map((list) =>
+            list.id === currentListId
+                ? { ...list, items: list.items.filter((item) => item.id !== itemId) }
+                : list,
+        );
+        setLists(updatedLists);
+    };
+
+    const startEditingList = (listId, currentName) => {
+        setEditingListId(listId);
+        setEditingListName(currentName);
+    };
+
+    const saveListName = () => {
+        if (!editingListName.trim()) return;
+        
+        const updatedLists = lists.map((list) =>
+            list.id === editingListId ? { ...list, name: editingListName } : list
+        );
+        setLists(updatedLists);
+        setEditingListId(null);
+        setEditingListName('');
+    };
+
+    const cancelEditingList = () => {
+        setEditingListId(null);
+        setEditingListName('');
+    };
+
+    const scrollToItem = (itemId) => {
+        const element = document.getElementById(`item-${itemId}`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Добавляем временную подсветку
+            element.classList.add('ring-4', 'ring-blue-300', 'ring-opacity-50');
+            setTimeout(() => {
+                element.classList.remove('ring-4', 'ring-blue-300', 'ring-opacity-50');
+            }, 2000);
+        }
+    };
+
+    const getTotalCost = () => {
+        if (!currentList) return 0;
+        return currentList.items.reduce((sum, item) => sum + item.totalPrice, 0);
+    };
+
+    const getCostPerPerson = () => {
+        return getTotalCost() / peopleCount;
+    };
+
+    const exportToMarkdown = (forImport = false) => {
+        if (!currentList) return;
+
+        if (forImport) {
+            // JSON формат для импорта
+            const exportData = {
+                name: currentList.name,
+                items: currentList.items,
+                exportedAt: new Date().toISOString(),
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${currentList.name}.json`;
+            link.click();
+        } else {
+            // Markdown для шаринга
+            let markdown = `# 🛒 ${currentList.name}\n\n`;
+            markdown += `**Общая стоимость:** ${getTotalCost().toFixed(2)} ₽\n`;
+            markdown += `**На ${peopleCount} чел:** ${getCostPerPerson().toFixed(2)} ₽/чел\n\n`;
+            markdown += `## Список продуктов:\n\n`;
+
+            currentList.items.forEach((item, index) => {
+                markdown += `${index + 1}. **${item.name}**\n`;
+                markdown += `   • ${item.quantity} ${item.unit} × ${item.pricePerUnit.toFixed(2)} ₽ = ${item.totalPrice.toFixed(2)} ₽\n\n`;
+            });
+
+            markdown += `---\n*Создано ${new Date().toLocaleDateString('ru-RU')}*`;
+
+            navigator.clipboard.writeText(markdown).then(() => {
+                alert('Список скопирован в буфер обмена!');
+            });
+        }
+    };
+
+    const importFromFile = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importData = JSON.parse(e.target.result);
+                const newList = {
+                    id: Date.now(),
+                    name: `${importData.name} (импорт)`,
+                    items: importData.items,
+                    createdAt: new Date().toISOString(),
+                };
+
+                setLists([...lists, newList]);
+                setCurrentListId(newList.id);
+                alert('Список успешно импортирован!');
+            } catch (error) {
+                alert('Ошибка при импорте файла');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    };
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+            {/* Header */}
+            <header className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50">
+                <div className="max-w-7xl mx-auto px-6 py-5">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent flex items-center gap-3">
+                            <span className="text-2xl">🛒</span>
+                            Списки продуктов
+                        </h1>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={importFromFile}
+                                className="hidden"
+                                id="import-file"
+                            />
+                            <label
+                                htmlFor="import-file"
+                                className="px-4 py-2.5 bg-gray-800 text-gray-300 rounded-xl hover:bg-gray-700 cursor-pointer transition-all text-sm border border-gray-700 hover:border-gray-600"
+                            >
+                                📥 Импорт
+                            </label>
+                            <button
+                                onClick={() => setShowNewListModal(true)}
+                                className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+                            >
+                                + Новый список
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div className="max-w-7xl mx-auto px-6 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Sidebar с списками */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-6">
+                            <h3 className="font-semibold text-white mb-4 text-lg">
+                                Мои списки
+                            </h3>
+                            <div className="space-y-3">
+                                {lists.map((list) => (
+                                    <div
+                                        key={list.id}
+                                        className={`p-4 rounded-xl cursor-pointer transition-all ${
+                                            currentListId === list.id
+                                                ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/50 shadow-lg'
+                                                : 'bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/30'
+                                        }`}
+                                        onClick={() => setCurrentListId(list.id)}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-medium text-white">
+                                                {list.name}
+                                            </span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteList(list.id);
+                                                }}
+                                                className="text-red-400 hover:text-red-300 transition-colors"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                        <div className="text-sm text-gray-400 mt-2">
+                                            {list.items.length} товаров
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Основной контент */}
+                    <div className="lg:col-span-3">
+                        {currentList ? (
+                            <div className="space-y-8">
+                                {/* Заголовок списка и статистика */}
+                                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8">
+                                    <div className="flex items-center justify-between mb-4">
+                                        {editingListId === currentList.id ? (
+                                            <div className="flex items-center gap-3">
+                                                <input
+                                                    type="text"
+                                                    value={editingListName}
+                                                    onChange={(e) => setEditingListName(e.target.value)}
+                                                    onKeyPress={(e) => e.key === 'Enter' && saveListName()}
+                                                    className="text-2xl font-bold text-white bg-transparent border-b-2 border-blue-500 outline-none"
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={saveListName}
+                                                    className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors"
+                                                >
+                                                    ✓
+                                                </button>
+                                                <button
+                                                    onClick={cancelEditingList}
+                                                    className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <h2
+                                                className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent cursor-pointer hover:from-blue-400 hover:to-purple-400 transition-all"
+                                                onClick={() => startEditingList(currentList.id, currentList.name)}
+                                                title="Нажмите для редактирования"
+                                            >
+                                                {currentList.name} ✏️
+                                            </h2>
+                                        )}
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => exportToMarkdown(false)}
+                                                className="px-4 py-2.5 bg-green-600/20 text-green-400 rounded-xl hover:bg-green-600/30 transition-all text-sm border border-green-600/30"
+                                            >
+                                                📋 Копировать
+                                            </button>
+                                            <button
+                                                onClick={() => exportToMarkdown(true)}
+                                                className="px-4 py-2.5 bg-blue-600/20 text-blue-400 rounded-xl hover:bg-blue-600/30 transition-all text-sm border border-blue-600/30"
+                                            >
+                                                📤 Экспорт
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 p-6 rounded-2xl border border-blue-600/30">
+                                            <div className="text-sm text-blue-400 font-medium mb-2">
+                                                Общая стоимость
+                                            </div>
+                                            <div className="text-3xl font-bold text-white">
+                                                {getTotalCost().toFixed(2)} ₽
+                                            </div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-6 rounded-2xl border border-green-600/30">
+                                            <div className="text-sm text-green-400 font-medium mb-2">
+                                                Количество человек
+                                            </div>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={peopleCount}
+                                                onChange={(e) =>
+                                                    setPeopleCount(
+                                                        Math.max(1, parseInt(e.target.value) || 1),
+                                                    )
+                                                }
+                                                className="text-3xl font-bold text-white bg-transparent border-none outline-none w-full"
+                                            />
+                                        </div>
+                                        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-6 rounded-2xl border border-purple-600/30">
+                                            <div className="text-sm text-purple-400 font-medium mb-2">
+                                                На человека
+                                            </div>
+                                            <div className="text-3xl font-bold text-white">
+                                                {getCostPerPerson().toFixed(2)} ₽
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Краткий предпросмотр списка */}
+                                {currentList.items.length > 0 && (
+                                    <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <h3 className="text-xl font-semibold text-white">
+                                                📋 Краткий список
+                                            </h3>
+                                            <div className="text-sm text-gray-400">
+                                                {currentList.items.length} товаров
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {currentList.items.map((item, index) => (
+                                                <div
+                                                    key={item.id}
+                                                    className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl hover:bg-gray-700/50 transition-all cursor-pointer group border border-gray-600/30"
+                                                    onClick={() => scrollToItem(item.id)}
+                                                >
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs text-gray-500 font-medium">
+                                                                {index + 1}.
+                                                            </span>
+                                                            <span className="font-medium text-white truncate">
+                                                                {item.name || 'Без названия'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-sm text-gray-400 mt-1">
+                                                            {item.quantity > 0 && item.pricePerUnit > 0 ? (
+                                                                <span>
+                                                                    {item.quantity} {item.unit} × {item.pricePerUnit.toFixed(2)} ₽
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-gray-500 italic">
+                                                                    Не заполнено
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="text-right">
+                                                            <div className="font-semibold text-white">
+                                                                {item.totalPrice.toFixed(2)} ₽
+                                                            </div>
+                                                        </div>
+                                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        
+                                        <div className="mt-6 pt-6 border-t border-gray-700/50">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-gray-400">
+                                                    Нажмите на товар для редактирования
+                                                </span>
+                                                <div className="flex items-center gap-4">
+                                                    <span className="text-gray-400">
+                                                        Заполнено: {currentList.items.filter(item => item.name && item.quantity > 0 && item.pricePerUnit > 0).length} из {currentList.items.length}
+                                                    </span>
+                                                    <span className="font-semibold text-white">
+                                                        Итого: {getTotalCost().toFixed(2)} ₽
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Список товаров */}
+                                <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-semibold text-white">
+                                            Товары
+                                        </h3>
+                                        <button
+                                            onClick={addItem}
+                                            className="px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+                                        >
+                                            + Добавить товар
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {currentList.items.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                id={`item-${item.id}`}
+                                                className="border border-gray-600/30 rounded-2xl p-6 hover:shadow-xl transition-all bg-gray-700/30 scroll-mt-4 hover:border-gray-500/50"
+                                            >
+                                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+                                                    {/* Название товара */}
+                                                    <div className="lg:col-span-4">
+                                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Название товара
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Введите название"
+                                                            value={item.name}
+                                                            onChange={(e) =>
+                                                                updateItem(
+                                                                    item.id,
+                                                                    'name',
+                                                                    e.target.value,
+                                                                )
+                                                            }
+                                                            className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
+                                                        />
+                                                    </div>
+
+                                                    {/* Цена за единицу */}
+                                                    <div className="lg:col-span-2">
+                                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Цена за ед.
+                                                        </label>
+                                                        <div className="relative">
+                                                            <input
+                                                                type="number"
+                                                                step="0.01"
+                                                                min="0"
+                                                                placeholder="0.00"
+                                                                value={item.pricePerUnit || ''}
+                                                                onChange={(e) =>
+                                                                    updateItem(
+                                                                        item.id,
+                                                                        'pricePerUnit',
+                                                                        parseFloat(e.target.value) || 0,
+                                                                    )
+                                                                }
+                                                                className="w-full px-4 py-3 pr-10 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
+                                                            />
+                                                            <span className="absolute right-3 top-3 text-gray-400 text-sm">₽</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Количество и единица измерения */}
+                                                    <div className="lg:col-span-3">
+                                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Количество
+                                                        </label>
+                                                        <div className="flex gap-2">
+                                                            <input
+                                                                type="number"
+                                                                step={item.unit === 'шт' || item.unit === 'упак' ? '1' : '0.5'}
+                                                                min="0"
+                                                                placeholder="0"
+                                                                value={item.quantity || ''}
+                                                                onChange={(e) =>
+                                                                    updateItem(
+                                                                        item.id,
+                                                                        'quantity',
+                                                                        parseFloat(e.target.value) || 0,
+                                                                    )
+                                                                }
+                                                                className="flex-1 px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
+                                                            />
+                                                            <select
+                                                                value={item.unit}
+                                                                onChange={(e) =>
+                                                                    updateItem(
+                                                                        item.id,
+                                                                        'unit',
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className="px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white min-w-[80px]"
+                                                            >
+                                                                <option value="шт">шт</option>
+                                                                <option value="кг">кг</option>
+                                                                <option value="л">л</option>
+                                                                <option value="упак">упак</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Общая стоимость */}
+                                                    <div className="lg:col-span-2">
+                                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Общая стоимость
+                                                        </label>
+                                                        <div className="relative">
+                                                            <input
+                                                                type="number"
+                                                                step="0.01"
+                                                                min="0"
+                                                                placeholder="0.00"
+                                                                value={item.totalPrice || ''}
+                                                                onChange={(e) =>
+                                                                    updateItem(
+                                                                        item.id,
+                                                                        'totalPrice',
+                                                                        parseFloat(e.target.value) || 0,
+                                                                    )
+                                                                }
+                                                                className="w-full px-4 py-3 pr-10 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400 font-medium"
+                                                            />
+                                                            <span className="absolute right-3 top-3 text-gray-400 text-sm">₽</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Кнопка удаления */}
+                                                    <div className="lg:col-span-1">
+                                                        <button
+                                                            onClick={() => deleteItem(item.id)}
+                                                            className="w-full px-3 py-3 bg-red-600/20 text-red-400 rounded-xl hover:bg-red-600/30 transition-all flex items-center justify-center border border-red-600/30"
+                                                            title="Удалить товар"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Мобильная версия - показываем расчет */}
+                                                <div className="lg:hidden mt-4 pt-4 border-t border-gray-600/50">
+                                                    <div className="text-sm text-gray-400">
+                                                        {item.quantity > 0 && item.pricePerUnit > 0 && (
+                                                            <span>
+                                                                {item.quantity} {item.unit} × {item.pricePerUnit.toFixed(2)} ₽ = {item.totalPrice.toFixed(2)} ₽
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {currentList.items.length === 0 && (
+                                            <div className="text-center py-12 text-gray-400">
+                                                <div className="text-4xl mb-4">📦</div>
+                                                <div className="text-lg">Список пуст. Добавьте первый товар!</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-16 text-center">
+                                <div className="text-gray-400 mb-8">
+                                    <div className="text-6xl mb-4">📝</div>
+                                    <div className="text-xl text-white mb-2">
+                                        Создайте свой первый список продуктов
+                                    </div>
+                                    <div className="text-gray-400">
+                                        Начните планировать покупки с умом
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowNewListModal(true)}
+                                    className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl text-lg"
+                                >
+                                    Создать список
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Модальное окно создания списка */}
+            {showNewListModal && (
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-md mx-4 border border-gray-700/50">
+                        <h3 className="text-xl font-semibold mb-6 text-white">
+                            Создать новый список
+                        </h3>
+                        <input
+                            type="text"
+                            placeholder="Название списка"
+                            value={newListName}
+                            onChange={(e) => setNewListName(e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-6 bg-gray-700/50 text-white placeholder-gray-400 transition-all"
+                            onKeyPress={(e) => e.key === 'Enter' && createNewList()}
+                            autoFocus
+                        />
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={createNewList}
+                                className="flex-1 px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all"
+                            >
+                                Создать
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowNewListModal(false);
+                                    setNewListName('');
+                                }}
+                                className="flex-1 px-5 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-all"
+                            >
+                                Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+} ======= const cancelEditingList = () => { setEditingListId(null); setEditingListName(''); }; const scrollToItem = (itemId) => { const element = document.getElementById(`item-${itemId}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Добавляем временную подсветку element.classList.add('ring-4', 'ring-blue-300', 'ring-opacity-50'); setTimeout(() => { element.classList.remove('ring-4', 'ring-blue-300', 'ring-opacity-50'); }, 2000); } }; const getTotalCost = () => { if (!currentList) return 0; return currentList.items.reduce((sum, item) => sum + item.totalPrice, 0); }; const getCostPerPerson = () => { return getTotalCost() / peopleCount; }; const exportToMarkdown = (forImport = false) => { if (!currentList) return; if (forImport) { // JSON формат для импорта const exportData = { name: currentList.name, items: currentList.items, exportedAt: new Date().toISOString(), }; const dataStr = JSON.stringify(exportData, null, 2); const dataBlob = new Blob([dataStr], { type: 'application/json' }); const url = URL.createObjectURL(dataBlob); const link = document.createElement('a'); link.href = url; link.download = `${currentList.name}.json`; link.click(); } else { // Markdown для шаринга let markdown = `# 🛒 ${currentList.name}\n\n`; markdown += `**Общая стоимость:** ${getTotalCost().toFixed(2)} ₽\n`; markdown += `**На ${peopleCount} чел:** ${getCostPerPerson().toFixed(2)} ₽/чел\n\n`; markdown += `## Список продуктов:\n\n`; currentList.items.forEach((item, index) => { markdown += `${index + 1}. **${item.name}**\n`; markdown += ` • ${item.quantity} ${item.unit} × ${item.pricePerUnit.toFixed(2)} ₽ = ${item.totalPrice.toFixed(2)} ₽\n\n`; }); markdown += `---\n*Создано ${new Date().toLocaleDateString('ru-RU')}*`; navigator.clipboard.writeText(markdown).then(() => { alert('Список скопирован в буфер обмена!'); }); } }; const importFromFile = (event) => { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const importData = JSON.parse(e.target.result); const newList = { id: Date.now(), name: `${importData.name} (импорт)`, items: importData.items, createdAt: new Date().toISOString(), }; setLists([...lists, newList]); setCurrentListId(newList.id); alert('Список успешно импортирован!'); } catch (error) { alert('Ошибка при импорте файла'); } }; reader.readAsText(file); event.target.value = ''; }; return ( <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" data-oid="ao85ld_" > {/* Header */} <header className="bg-white shadow-sm border-b" data-oid="o_telh3"> <div className="max-w-6xl mx-auto px-4 py-4" data-oid="t2gy1mc"> <div className="flex items-center justify-between" data-oid="-hv9k4f"> <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2" data-oid="7nq9vys" > 🛒 Списки продуктов </h1> <div className="flex items-center gap-3 h-full" data-oid="bba0zr:"> <input type="file" accept=".json" onChange={importFromFile} className="hidden" id="import-file" data-oid="57-:lhd" /> <label htmlFor="import-file" className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors flex justify-center items-center text-[10px] h-[42px]" data-oid="z1t.r5-" > 📥 </label> <button onClick={() => setShowNewListModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-[fit-content] text-[16px]" data-oid="8knq:bz" > + </button> </div> </div> </div> </header> <div className="max-w-7xl mx-auto px-6 py-8" data-oid="cui6pwf"> <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" data-oid=":bk5tf-"> {/* Sidebar с списками */} <div className="lg:col-span-1" data-oid="l6yi387"> <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-6" data-oid="occh4o_"> <h3 className="font-semibold text-white mb-4 text-lg" data-oid="x7u477y"> Мои списки </h3> <div className="space-y-3" data-oid="32ooj5g"> {lists.map((list) => ( <div key={list.id} className={`p-4 rounded-xl cursor-pointer transition-all ${ currentListId === list.id ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/50 shadow-lg' : 'bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/30' }`} onClick={() => setCurrentListId(list.id)} data-oid="2-:.apo" > <div className="flex items-center justify-between" data-oid="0iefq69" > <span className="font-medium text-white" data-oid="m_i2mjv" > {list.name} </span> <button onClick={(e) => { e.stopPropagation(); deleteList(list.id); }} className="text-red-400 hover:text-red-300 transition-colors" data-oid="jxbktjr" > ✕ </button> </div> <div className="text-sm text-gray-400 mt-2" data-oid="wjrvtd2" > {list.items.length} товаров </div> </div> ))} </div> </div> </div> {/* Основной контент */} <div className="lg:col-span-3" data-oid="l_p76zd"> {currentList ? ( <div className="space-y-6" data-oid="tnihgt6"> {/* Заголовок списка и статистика */} <div className="bg-white rounded-xl shadow-sm p-6" data-oid="6yi8qk8" > <div className="flex items-center justify-between mb-4 flex-col gap-[12px]" data-oid="svrlkm9" > {editingListId === currentList.id ? ( <div className="flex items-center gap-2" data-oid="tu9cpoc" > <input type="text" value={editingListName} onChange={(e) => setEditingListName(e.target.value) } onKeyPress={(e) => e.key === 'Enter' && saveListName() } className="text-xl font-bold text-gray-800 bg-transparent border-b-2 border-blue-500 outline-none" autoFocus data-oid="yye4btl" /> <button onClick={saveListName} className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200" data-oid="gz6isbx" > ✓ </button> <button onClick={cancelEditingList} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200" data-oid="soob-ml" > ✕ </button> </div> ) : ( <h2 className="text-xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors w-full" onClick={() => startEditingList( currentList.id, currentList.name, ) } title="Нажмите для редактирования" data-oid="lt8muev" > {currentList.name} ✏️ </h2> )} <div className="flex items-center gap-3 w-full" data-oid="7z:lxpe" key="olk-UnJR" > <button onClick={() => exportToMarkdown(true)} className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm flex" data-oid="xdlw1ao" key="olk--e-X" > 📤 </button> <button onClick={() => exportToMarkdown(false)} className="px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm flex justify-center w-[fit-content]" data-oid="_5:1qe1" key="olk-itPi" > 📋 </button> </div> </div<div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-oid="qt7jz70" > <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 p-6 rounded-2xl border border-blue-600/30" data-oid="w53fokd" > <div className="text-sm text-blue-400 font-medium mb-2" data-oid="u:x.x0y" > Общая стоимость </div> <div className="text-3xl font-bold text-white" data-oid="mtgnh.v" > {getTotalCost().toFixed(2)} ₽ </div> </div> <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 p-6 rounded-2xl border border-green-600/30" data-oid="j469fhw" > <div className="text-sm text-green-400 font-medium mb-2" data-oid="da2o59l" > Количество человек </div> <input type="number" min="1" value={peopleCount} onChange={(e) => setPeopleCount( Math.max(1, parseInt(e.target.value) || 1), ) } className="text-3xl font-bold text-white bg-transparent border-none outline-none w-full" data-oid="q3qsbvb" /> </div> <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 p-6 rounded-2xl border border-purple-600/30" data-oid="imo:n3c" > <div className="text-sm text-purple-400 font-medium mb-2" data-oid="ma:piyh" > На человека </div> <div className="text-3xl font-bold text-white" data-oid="l7fgm95" > {getCostPerPerson().toFixed(2)} ₽ </div> </div> </div> </div{/* Краткий предпросмотр списка */} {currentList.items.length > 0 && ( <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8"> <div className="flex items-center justify-between mb-6"> <h3 className="text-xl font-semibold text-white"> 📋 Краткий список </h3> <div className="text-sm text-gray-400"> {currentList.items.length} товаров </div> </div> <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {currentList.items.map((item, index) => ( <div key={item.id} className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl hover:bg-gray-700/50 transition-all cursor-pointer group border border-gray-600/30" onClick={() => scrollToItem(item.id)} > <div className="flex-1 min-w-0"> <div className="flex items-center gap-2"> <span className="text-xs text-gray-500 font-medium"> {index + 1}. </span> <span className="font-medium text-white truncate"> {item.name || 'Без названия'} </span> </div> <div className="text-sm text-gray-400 mt-1"> {item.quantity > 0 && item.pricePerUnit > 0 ? ( <span> {item.quantity} {item.unit} × {item.pricePerUnit.toFixed(2)} ₽ </span> ) : ( <span className="text-gray-500 italic"> Не заполнено </span> )} </div> </div> <div className="flex items-center gap-2"> <div className="text-right"> <div className="font-semibold text-white"> {item.totalPrice.toFixed(2)} ₽ </div> </div> <div className="opacity-0 group-hover:opacity-100 transition-opacity"> <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /> </svg> </div> </div> </div> ))} </div> <div className="mt-6 pt-6 border-t border-gray-700/50"> <div className="flex justify-between items-center text-sm"> <span className="text-gray-400"> Нажмите на товар для редактирования </span> <div className="flex items-center gap-4"> <span className="text-gray-400"> Заполнено: {currentList.items.filter(item => item.name && item.quantity > 0 && item.pricePerUnit > 0).length} из {currentList.items.length} </span> <span className="font-semibold text-white"> Итого: {getTotalCost().toFixed(2)} ₽ </span> </div> </div> </div> </div> )} {/* Список товаров */} <div className="bg-white rounded-xl shadow-sm p-6" data-oid=":w-lf1j" > <div className="items-center justify-between mb-4 flex flex-col gap-[16px]" data-oid="s3vhu8h" > <h3 className="text-lg font-semibold text-gray-800" data-oid="0r844:0" > Продукты </h3> <button onClick={addItem} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full" data-oid="9g7cp54" > + Добавить продукт </button> </div> <div className="space-y-4" data-oid="c4gf9b5"{currentList.items.map((item) => ( <div key={item.id} id={`item-${item.id}`} className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all bg-gray-50 scroll-mt-4" data-oid="9jgv0d5" > <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end" data-oid="8txpx3n" > {/* Название товара */} <div className="lg:col-span-4" data-oid="vvm3c.k" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="q.dd6s2" > Название товара </label> <input type="text" placeholder="Введите название" value={item.name} onChange={(e) => updateItem( item.id, 'name', e.target.value, ) } className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white" data-oid="r0in19x" /> </div> {/* Цена за единицу */} <div className="lg:col-span-2" data-oid="4ga8lnk" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="z9.87gp" > Цена за ед. </label> <div className="relative" data-oid="ubczhiq" > <input type="number" step="0.01" min="0" placeholder="0.00" value={item.pricePerUnit || ''} onChange={(e) => updateItem( item.id, 'pricePerUnit', parseFloat( e.target.value, ) || 0, ) } className="w-full px-3 py-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white" data-oid="qnustvd" /> <span className="absolute right-3 top-2.5 text-gray-500 text-sm" data-oid="7qcw7x6" > ₽ </span> </div> </div> {/* Количество и единица измерения */} <div className="lg:col-span-3" data-oid="gj:_17a" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="aze7q_e" > Количество </label> <div className="flex gap-2" data-oid=".kj_u9-" > <input type="number" step={ item.unit === 'шт' || item.unit === 'упак' ? '1' : '0.5' } min="0" placeholder="0" value={item.quantity || ''} onChange={(e) => updateItem( item.id, 'quantity', parseFloat( e.target.value, ) || 0, ) } className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white w-[102px]" data-oid=":ow.-9t" /> <select value={item.unit} onChange={(e) => updateItem( item.id, 'unit', e.target.value, ) } className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white min-w-[70px]" data-oid="mclz28t" > <option value="шт" data-oid="-1vgoxw" > шт </option> <option value="кг" data-oid="vgo634c" > кг </option> <option value="л" data-oid="mcwjc5r" > л </option> <option value="упак" data-oid="_yjsx84" > упак </option> </select> </div> </div> {/* Общая стоимость */} <div className="lg:col-span-2" data-oid="tcjbbzl" > <label className="block text-sm font-medium text-gray-700 mb-1" data-oid="egff78n" > Общая стоимость </label> <div className="relative" data-oid="-4gq4ei" > <input type="number" step="0.01" min="0" placeholder="0.00" value={item.totalPrice || ''} onChange={(e) => updateItem( item.id, 'totalPrice', parseFloat( e.target.value, ) || 0, ) } className="w-full px-3 py-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white font-medium" data-oid="iz9qeq9" /> <span className="absolute right-3 top-2.5 text-gray-500 text-sm" data-oid="mx5qjmu" > ₽ </span> </div> </div> {/* Кнопка удаления */} <div className="lg:col-span-1" data-oid="12u8bi5" > <button onClick={() => deleteItem(item.id)} className="w-full px-3 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center" title="Удалить товар" data-oid="mhq8hmp" > 🗑️ </button> </div> </div> {/* Мобильная версия - показываем расчет */} <div className="lg:hidden mt-3 pt-3 border-t border-gray-200" data-oid="6y5l2:s" > <div className="text-sm text-gray-600" data-oid="j5i2.ft" > {item.quantity > 0 && item.pricePerUnit > 0 && ( <span data-oid="vlyx5ox"> {item.quantity} {item.unit} ×{' '} {item.pricePerUnit.toFixed(2)} ₽ = {item.totalPrice.toFixed(2)} ₽ </span> )} </div> </div> </div> ))} {currentList.items.length === 0 && ( <div className="text-center py-8 text-gray-500" data-oid="4gktaz-" > Список пуст. Добавьте первый товар! </div> )} </div> </div> </div) : ( <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-16 text-center" data-oid="izmwqbc" > <div className="text-gray-400 mb-8" data-oid=":1y-y56"> <div className="text-6xl mb-4" data-oid="czpbbur"> 📝 </div> <div className="text-xl text-white mb-2" data-oid=".e626yo"> Создайте свой первый список продуктов </div> <div className="text-gray-400"> Начните планировать покупки с умом </div> </div> <button onClick={() => setShowNewListModal(true)} className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl text-lg" data-oid="4lya6jk" > Создать список </button> </div> )} </div> </div> </div{/* Модальное окно создания списка */} {showNewListModal && ( <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" data-oid="yavx3aq" > <div className="bg-gray-800 rounded-2xl p-8 w-full max-w-md mx-4 border border-gray-700/50" data-oid="u24qaxk" > <h3 className="text-xl font-semibold mb-6 text-white" data-oid="gayllxa"> Создать новый список </h3> <input type="text" placeholder="Название списка" value={newListName} onChange={(e) => setNewListName(e.target.value)} className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-6 bg-gray-700/50 text-white placeholder-gray-400 transition-all" onKeyPress={(e) => e.key === 'Enter' && createNewList()} data-oid=":6ahz:c" autoFocus /> <div className="flex gap-3" data-oid="1jws8uh"> <button onClick={createNewList} className="flex-1 px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all" data-oid="nob.r__" > Создать </button> <button onClick={() => { setShowNewListModal(false); setNewListName(''); }} className="flex-1 px-5 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-all" data-oid="5x1aqxj" > Отмена </button> </div> </div> </div> )} </div> ); }
