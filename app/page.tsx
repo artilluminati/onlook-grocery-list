@@ -234,68 +234,68 @@ export default function Page() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900" data-oid="-ljnnuj">
+        <div className="min-h-screen bg-gray-900" data-oid="wd7-iel">
             {/* Header */}
             <header
                 className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50"
-                data-oid="5sqlmxl"
+                data-oid="6jc:1c7"
             >
                 <div
-                    className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between"
-                    data-oid="p0udlvj"
+                    className="max-w-7xl mx-auto px-3 py-5 flex flex-col gap-y-4 items-center justify-between"
+                    data-oid="ixg-6wg"
                 >
                     <h1
                         className="text-3xl font-bold text-white flex items-center gap-3"
-                        data-oid="yzonzlk"
+                        data-oid=".8.8l.f"
                     >
-                        <span className="text-2xl" data-oid="n9srsof">
+                        <span className="text-2xl" data-oid="fqmno4c">
                             🛒
                         </span>{' '}
                         Списки продуктов
                     </h1>
-                    <div className="flex items-center gap-3" data-oid="eb2x_.5">
+                    <div className="flex gap-3 flex-row items-stretch" data-oid="2axjh74">
                         <input
                             type="file"
                             accept=".json"
                             onChange={importFromFile}
                             className="hidden"
                             id="import-file"
-                            data-oid="wvk5ias"
+                            data-oid="4s0-7c4"
                         />
 
                         <label
                             htmlFor="import-file"
-                            className="px-4 py-2.5 bg-gray-800 text-gray-300 rounded-xl hover:bg-gray-700 cursor-pointer transition-all text-sm border border-gray-700 hover:border-gray-600"
-                            data-oid="q:vgl4-"
+                            className="flex px-4 max-h-full items-center bg-gray-800 text-gray-300 rounded-xl hover:bg-gray-700 cursor-pointer transition-all text-base border border-gray-700 hover:border-gray-600 items-center"
+                            data-oid="nya_p1i"
                         >
                             📥 Импорт
                         </label>
                         <button
                             onClick={() => setShowNewListModal(true)}
-                            className="px-5 py-2.5 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
-                            data-oid="xmrb:qc"
+                            className="px-5 pt-1 pb-2 text-2xl bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
+                            data-oid="5-i59qz"
                         >
-                            + Новый список
+                            +
                         </button>
                     </div>
                 </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-6 py-8" data-oid="e1af8i.">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" data-oid="e4dleab">
+            <div className="max-w-7xl mx-auto px-3 py-8" data-oid="lkz5eki">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8" data-oid="z9hnx4b">
                     {/* Sidebar с списками */}
-                    <div className="lg:col-span-1" data-oid="3hzb4r_">
+                    <div className="lg:col-span-1" data-oid=":66iw56">
                         <div
-                            className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-6"
-                            data-oid="l-bl5.2"
+                            className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 py-6 px-3"
+                            data-oid="7f7qi.l"
                         >
                             <h3
                                 className="font-semibold text-white mb-4 text-lg"
-                                data-oid="udxr_cf"
+                                data-oid=":h97m9v"
                             >
                                 Мои списки
                             </h3>
-                            <div className="space-y-3" data-oid="415:6zp">
+                            <div className="space-y-3" data-oid="vtbwf7m">
                                 {lists.map((list) => (
                                     <div
                                         key={list.id}
@@ -305,15 +305,15 @@ export default function Page() {
                                                 : 'bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/30'
                                         }`}
                                         onClick={() => setCurrentListId(list.id)}
-                                        data-oid="nt:n35o"
+                                        data-oid="tt-3rbz"
                                     >
                                         <div
                                             className="flex items-center justify-between"
-                                            data-oid="va::m4n"
+                                            data-oid="n_jiu10"
                                         >
                                             <span
                                                 className="font-medium text-white"
-                                                data-oid="nbojz5:"
+                                                data-oid="6-vhw28"
                                             >
                                                 {list.name}
                                             </span>
@@ -323,14 +323,14 @@ export default function Page() {
                                                     deleteList(list.id);
                                                 }}
                                                 className="text-red-400 hover:text-red-300 transition-colors"
-                                                data-oid="h5fkzb2"
+                                                data-oid="y66phm_"
                                             >
                                                 ✕
                                             </button>
                                         </div>
                                         <div
                                             className="text-sm text-gray-400 mt-2"
-                                            data-oid="fsn4z3g"
+                                            data-oid="u2tun02"
                                         >
                                             {list.items.length} товаров
                                         </div>
@@ -341,22 +341,22 @@ export default function Page() {
                     </div>
 
                     {/* Основной контент */}
-                    <div className="lg:col-span-3" data-oid="burjbmt">
+                    <div className="lg:col-span-3" data-oid="j:pqg0e">
                         {currentList ? (
-                            <div className="space-y-8" data-oid="wt::hs5">
+                            <div className="space-y-8" data-oid="81bbiah">
                                 {/* Заголовок списка и статистика */}
                                 <div
-                                    className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8"
-                                    data-oid="bsc807s"
+                                    className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 py-8 px-3"
+                                    data-oid="gg3ibn5"
                                 >
                                     <div
-                                        className="flex items-center justify-between mb-4"
-                                        data-oid="85wakr1"
+                                        className="flex items-center flex-col gap-y-4 justify-between mb-4"
+                                        data-oid="ieowz72"
                                     >
                                         {editingListId === currentList.id ? (
                                             <div
                                                 className="flex items-center gap-3"
-                                                data-oid="jjam7pf"
+                                                data-oid="81gyd9c"
                                             >
                                                 <input
                                                     type="text"
@@ -369,20 +369,20 @@ export default function Page() {
                                                     }
                                                     className="text-2xl font-bold text-white bg-transparent border-b-2 border-blue-500 outline-none"
                                                     autoFocus
-                                                    data-oid="kcn:t76"
+                                                    data-oid="bi-q1cs"
                                                 />
 
                                                 <button
                                                     onClick={saveListName}
                                                     className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors"
-                                                    data-oid="-d6eomg"
+                                                    data-oid="_b_pbs2"
                                                 >
                                                     ✓
                                                 </button>
                                                 <button
                                                     onClick={cancelEditingList}
                                                     className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors"
-                                                    data-oid="d.nbvaa"
+                                                    data-oid="ce:.qf0"
                                                 >
                                                     ✕
                                                 </button>
@@ -397,23 +397,23 @@ export default function Page() {
                                                     )
                                                 }
                                                 title="Нажмите для редактирования"
-                                                data-oid="wpu3r0p"
+                                                data-oid="9a18kit"
                                             >
                                                 {currentList.name} ✏️
                                             </h2>
                                         )}
-                                        <div className="flex items-center gap-3" data-oid="qt:ju-w">
+                                        <div className="flex items-center gap-3" data-oid="a:yhb3p">
                                             <button
                                                 onClick={() => exportToMarkdown(false)}
                                                 className="px-4 py-2.5 bg-green-600/20 text-green-400 rounded-xl hover:bg-green-600/30 transition-all text-sm border border-green-600/30"
-                                                data-oid="8u.fbd3"
+                                                data-oid="3jeq0hg"
                                             >
                                                 📋 Копировать
                                             </button>
                                             <button
                                                 onClick={() => exportToMarkdown(true)}
                                                 className="px-4 py-2.5 bg-blue-600/20 text-blue-400 rounded-xl hover:bg-blue-600/30 transition-all text-sm border border-blue-600/30"
-                                                data-oid="k.g-:rq"
+                                                data-oid="n5wir4i"
                                             >
                                                 📤 Экспорт
                                             </button>
@@ -422,33 +422,33 @@ export default function Page() {
 
                                     <div
                                         className="grid grid-cols-1 md:grid-cols-3 gap-6"
-                                        data-oid="8-l:k-v"
+                                        data-oid="07udnlu"
                                     >
                                         <div
-                                            className="bg-blue-600/20 p-6 rounded-2xl border border-blue-600/30"
-                                            data-oid="ahm4iq3"
+                                            className="bg-blue-600/20 py-6 px-3 rounded-2xl border border-blue-600/30"
+                                            data-oid=".enizdb"
                                         >
                                             <div
                                                 className="text-sm text-blue-400 font-medium mb-2"
-                                                data-oid="hs:tw2z"
+                                                data-oid="8_7v66i"
                                             >
                                                 Общая стоимость
                                             </div>
                                             <div
                                                 className="text-3xl font-bold text-white"
-                                                data-oid="zu1vqje"
+                                                data-oid="fh.29rq"
                                             >
                                                 {getTotalCost().toFixed(2)} ₽
                                             </div>
                                         </div>
 
                                         <div
-                                            className="bg-green-600/20 p-6 rounded-2xl border border-green-600/30"
-                                            data-oid="dg7j3td"
+                                            className="bg-green-600/20 py-6 px-3 rounded-2xl border border-green-600/30"
+                                            data-oid=":qoyq7z"
                                         >
                                             <div
                                                 className="text-sm text-green-400 font-medium mb-2"
-                                                data-oid="xslohq5"
+                                                data-oid="kmko0hz"
                                             >
                                                 Количество человек
                                             </div>
@@ -462,23 +462,23 @@ export default function Page() {
                                                     )
                                                 }
                                                 className="text-3xl font-bold text-white bg-transparent border-none outline-none w-full"
-                                                data-oid="wq-:85m"
+                                                data-oid="kg50na9"
                                             />
                                         </div>
 
                                         <div
-                                            className="bg-orange-600/20 p-6 rounded-2xl border border-orange-600/30"
-                                            data-oid="nkrtkty"
+                                            className="bg-orange-600/20 py-6 px-3 rounded-2xl border border-orange-600/30"
+                                            data-oid="m7:2h:g"
                                         >
                                             <div
                                                 className="text-sm text-orange-400 font-medium mb-2"
-                                                data-oid="rv0.gpo"
+                                                data-oid="uit4_c:"
                                             >
                                                 На человека
                                             </div>
                                             <div
                                                 className="text-3xl font-bold text-white"
-                                                data-oid="100dqsv"
+                                                data-oid="r6y100i"
                                             >
                                                 {getCostPerPerson().toFixed(2)} ₽
                                             </div>
@@ -489,22 +489,22 @@ export default function Page() {
                                 {/* Краткий предпросмотр списка */}
                                 {currentList.items.length > 0 && (
                                     <div
-                                        className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8"
-                                        data-oid="mpe7a5f"
+                                        className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 py-8 px-3"
+                                        data-oid="7b9-a7r"
                                     >
                                         <div
                                             className="flex items-center justify-between mb-6"
-                                            data-oid="34:.8dm"
+                                            data-oid="bto52w4"
                                         >
                                             <h3
                                                 className="text-xl font-semibold text-white"
-                                                data-oid="k:o-52u"
+                                                data-oid="0vys7j."
                                             >
                                                 📋 Краткий список
                                             </h3>
                                             <div
                                                 className="text-sm text-gray-400"
-                                                data-oid="t-03d1d"
+                                                data-oid="f0l53-:"
                                             >
                                                 {currentList.items.length} товаров
                                             </div>
@@ -512,50 +512,50 @@ export default function Page() {
 
                                         <div
                                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                                            data-oid=":mrx_za"
+                                            data-oid="7a27axz"
                                         >
                                             {currentList.items.map((item, index) => (
                                                 <div
                                                     key={item.id}
                                                     className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl hover:bg-gray-700/50 transition-all cursor-pointer group border border-gray-600/30"
                                                     onClick={() => scrollToItem(item.id)}
-                                                    data-oid="t3bqr2p"
+                                                    data-oid="84w:zuh"
                                                 >
                                                     <div
                                                         className="flex-1 min-w-0"
-                                                        data-oid="z43di8c"
+                                                        data-oid="g7ak6op"
                                                     >
                                                         <div
                                                             className="flex items-center gap-2"
-                                                            data-oid="aa7qokb"
+                                                            data-oid="i:5pmyz"
                                                         >
                                                             <span
                                                                 className="text-xs text-gray-500 font-medium"
-                                                                data-oid="3zjzbma"
+                                                                data-oid="3o.qbwy"
                                                             >
                                                                 {index + 1}.
                                                             </span>
                                                             <span
                                                                 className="font-medium text-white truncate"
-                                                                data-oid="2l0gdi."
+                                                                data-oid="d4h1fmz"
                                                             >
                                                                 {item.name || 'Без названия'}
                                                             </span>
                                                         </div>
                                                         <div
                                                             className="text-sm text-gray-400 mt-1"
-                                                            data-oid="g8o268j"
+                                                            data-oid="qqcnbmk"
                                                         >
                                                             {item.quantity > 0 &&
                                                             item.pricePerUnit > 0 ? (
-                                                                <span data-oid="eo46qj9">
+                                                                <span data-oid="x0arcgz">
                                                                     {item.quantity} {item.unit} ×{' '}
                                                                     {item.pricePerUnit.toFixed(2)} ₽
                                                                 </span>
                                                             ) : (
                                                                 <span
                                                                     className="text-gray-500 italic"
-                                                                    data-oid="5ofwxoy"
+                                                                    data-oid="iv1qdt9"
                                                                 >
                                                                     Не заполнено
                                                                 </span>
@@ -564,36 +564,36 @@ export default function Page() {
                                                     </div>
                                                     <div
                                                         className="flex items-center gap-2"
-                                                        data-oid="66fzb54"
+                                                        data-oid="r9:6zhi"
                                                     >
                                                         <div
                                                             className="text-right"
-                                                            data-oid="mvz7jq_"
+                                                            data-oid="ev:ffdx"
                                                         >
                                                             <div
                                                                 className="font-semibold text-white"
-                                                                data-oid="lhvsnuv"
+                                                                data-oid="d0_48:g"
                                                             >
                                                                 {item.totalPrice.toFixed(2)} ₽
                                                             </div>
                                                         </div>
                                                         <div
                                                             className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                                            data-oid="5znexr3"
+                                                            data-oid="flpqnc1"
                                                         >
                                                             <svg
                                                                 className="w-4 h-4 text-blue-400"
                                                                 fill="none"
                                                                 stroke="currentColor"
                                                                 viewBox="0 0 24 24"
-                                                                data-oid=".-8yzc3"
+                                                                data-oid="d.coyu."
                                                             >
                                                                 <path
                                                                     strokeLinecap="round"
                                                                     strokeLinejoin="round"
                                                                     strokeWidth={2}
                                                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                                                    data-oid="o_g8lvd"
+                                                                    data-oid="4x-gpyc"
                                                                 />
                                                             </svg>
                                                         </div>
@@ -604,22 +604,22 @@ export default function Page() {
 
                                         <div
                                             className="mt-6 pt-6 border-t border-gray-700/50"
-                                            data-oid="bujzpyn"
+                                            data-oid="q.an-kd"
                                         >
                                             <div
-                                                className="flex justify-between items-center text-sm"
-                                                data-oid="ul0hvyw"
+                                                className="flex flex-col gap-y-4 justify-between items-center text-sm"
+                                                data-oid="5:z_dev"
                                             >
-                                                <span className="text-gray-400" data-oid=":2sez5_">
-                                                    Нажмите на товар для редактирования
-                                                </span>
+                                                {/* <span className="text-gray-400" data-oid="nvm8w-_">
+                      (Нажмите на товар для редактирования)
+                      </span> */}
                                                 <div
-                                                    className="flex items-center gap-4"
-                                                    data-oid="zf-dh:8"
+                                                    className="flex justify-between w-full items-center gap-4"
+                                                    data-oid="w1c4v0p"
                                                 >
                                                     <span
                                                         className="text-gray-400"
-                                                        data-oid="_n80tj4"
+                                                        data-oid="u_fgtx3"
                                                     >
                                                         Заполнено:{' '}
                                                         {
@@ -634,7 +634,7 @@ export default function Page() {
                                                     </span>
                                                     <span
                                                         className="font-semibold text-white"
-                                                        data-oid="4285kk1"
+                                                        data-oid="jx8qez:"
                                                     >
                                                         Итого: {getTotalCost().toFixed(2)} ₽
                                                     </span>
@@ -646,48 +646,48 @@ export default function Page() {
 
                                 {/* Список товаров */}
                                 <div
-                                    className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-8"
-                                    data-oid="ycbr0pv"
+                                    className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 py-8 px-3"
+                                    data-oid="jflz31c"
                                 >
                                     <div
-                                        className="flex items-center justify-between mb-6"
-                                        data-oid="78262sp"
+                                        className="flex flex-col gap-y-4 items-center justify-between mb-6"
+                                        data-oid="uhlc5zh"
                                     >
                                         <h3
                                             className="text-xl font-semibold text-white"
-                                            data-oid="wca01_n"
+                                            data-oid=".yxh23n"
                                         >
                                             Товары
                                         </h3>
                                         <button
                                             onClick={addItem}
                                             className="px-5 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
-                                            data-oid="1gy-t6m"
+                                            data-oid="loxvwqk"
                                         >
                                             + Добавить товар
                                         </button>
                                     </div>
 
-                                    <div className="space-y-4" data-oid="g0x0r6v">
+                                    <div className="space-y-4" data-oid="3fqe.oo">
                                         {currentList.items.map((item) => (
                                             <div
                                                 key={item.id}
                                                 id={`item-${item.id}`}
-                                                className="border border-gray-600/30 rounded-2xl p-6 hover:shadow-xl transition-all bg-gray-700/30 scroll-mt-4 hover:border-gray-500/50"
-                                                data-oid="x3sn7b7"
+                                                className="border border-gray-600/30 rounded-2xl py-6 px-3 hover:shadow-xl transition-all bg-gray-700/30 scroll-mt-4 hover:border-gray-500/50"
+                                                data-oid="43yk9ug"
                                             >
                                                 <div
                                                     className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end"
-                                                    data-oid="de:68ft"
+                                                    data-oid="_qp2l1v"
                                                 >
                                                     {/* Название товара */}
                                                     <div
                                                         className="lg:col-span-4"
-                                                        data-oid="bme0vbt"
+                                                        data-oid="thx8-_."
                                                     >
                                                         <label
                                                             className="block text-sm font-medium text-gray-300 mb-2"
-                                                            data-oid="sbrfg6a"
+                                                            data-oid="wrhh61l"
                                                         >
                                                             Название товара
                                                         </label>
@@ -703,24 +703,24 @@ export default function Page() {
                                                                 )
                                                             }
                                                             className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
-                                                            data-oid="xsaejcy"
+                                                            data-oid="kzc11l."
                                                         />
                                                     </div>
 
                                                     {/* Цена за единицу */}
                                                     <div
                                                         className="lg:col-span-2"
-                                                        data-oid="usswhc5"
+                                                        data-oid="l3z:1m5"
                                                     >
                                                         <label
                                                             className="block text-sm font-medium text-gray-300 mb-2"
-                                                            data-oid="x43b9mu"
+                                                            data-oid="75.ma.i"
                                                         >
                                                             Цена за ед.
                                                         </label>
                                                         <div
                                                             className="relative"
-                                                            data-oid="fv-08gu"
+                                                            data-oid="c.6j8v3"
                                                         >
                                                             <input
                                                                 type="number"
@@ -738,12 +738,12 @@ export default function Page() {
                                                                     )
                                                                 }
                                                                 className="w-full px-4 py-3 pr-10 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
-                                                                data-oid="l1srt9u"
+                                                                data-oid="k4s8w5f"
                                                             />
 
                                                             <span
                                                                 className="absolute right-3 top-3 text-gray-400 text-sm"
-                                                                data-oid="py-j0rb"
+                                                                data-oid="ed3-b-n"
                                                             >
                                                                 ₽
                                                             </span>
@@ -753,17 +753,17 @@ export default function Page() {
                                                     {/* Количество и единица измерения */}
                                                     <div
                                                         className="lg:col-span-3"
-                                                        data-oid="8he.12p"
+                                                        data-oid="zuj-3jk"
                                                     >
                                                         <label
                                                             className="block text-sm font-medium text-gray-300 mb-2"
-                                                            data-oid="cqo04hf"
+                                                            data-oid="lpr41zz"
                                                         >
                                                             Количество
                                                         </label>
                                                         <div
-                                                            className="flex gap-2"
-                                                            data-oid="l7u0_ck"
+                                                            className="flex max-w-full justify-between gap-2"
+                                                            data-oid="uwntcrl"
                                                         >
                                                             <input
                                                                 type="number"
@@ -785,8 +785,8 @@ export default function Page() {
                                                                         ) || 0,
                                                                     )
                                                                 }
-                                                                className="flex-1 px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
-                                                                data-oid="v2yq0cu"
+                                                                className="flex-1 w-full flex-shrink px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400"
+                                                                data-oid="kh9j.s5"
                                                             />
 
                                                             <select
@@ -799,29 +799,29 @@ export default function Page() {
                                                                     )
                                                                 }
                                                                 className="px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white min-w-[80px]"
-                                                                data-oid="v:tew2a"
+                                                                data-oid="cf.st.x"
                                                             >
                                                                 <option
                                                                     value="шт"
-                                                                    data-oid="0noa:9b"
+                                                                    data-oid=".998sx4"
                                                                 >
                                                                     шт
                                                                 </option>
                                                                 <option
                                                                     value="кг"
-                                                                    data-oid="0unwowl"
+                                                                    data-oid="o:9su3z"
                                                                 >
                                                                     кг
                                                                 </option>
                                                                 <option
                                                                     value="л"
-                                                                    data-oid=".ftm477"
+                                                                    data-oid="-_vpf2m"
                                                                 >
                                                                     л
                                                                 </option>
                                                                 <option
                                                                     value="упак"
-                                                                    data-oid="wq3ikbd"
+                                                                    data-oid="lt5f960"
                                                                 >
                                                                     упак
                                                                 </option>
@@ -832,17 +832,17 @@ export default function Page() {
                                                     {/* Общая стоимость */}
                                                     <div
                                                         className="lg:col-span-2"
-                                                        data-oid="-evcobq"
+                                                        data-oid="-y:o3nh"
                                                     >
                                                         <label
                                                             className="block text-sm font-medium text-gray-300 mb-2"
-                                                            data-oid="4njr9aq"
+                                                            data-oid="gdat43r"
                                                         >
                                                             Общая стоимость
                                                         </label>
                                                         <div
                                                             className="relative"
-                                                            data-oid="8ykx_dm"
+                                                            data-oid="s38w-y0"
                                                         >
                                                             <input
                                                                 type="number"
@@ -860,12 +860,12 @@ export default function Page() {
                                                                     )
                                                                 }
                                                                 className="w-full px-4 py-3 pr-10 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-800/50 text-white placeholder-gray-400 font-medium"
-                                                                data-oid="29tf2l9"
+                                                                data-oid="c34:dd-"
                                                             />
 
                                                             <span
                                                                 className="absolute right-3 top-3 text-gray-400 text-sm"
-                                                                data-oid="mhckyud"
+                                                                data-oid="wljk-s7"
                                                             >
                                                                 ₽
                                                             </span>
@@ -875,13 +875,13 @@ export default function Page() {
                                                     {/* Кнопка удаления */}
                                                     <div
                                                         className="lg:col-span-1"
-                                                        data-oid="3xzhsq4"
+                                                        data-oid="ir8iinq"
                                                     >
                                                         <button
                                                             onClick={() => deleteItem(item.id)}
                                                             className="w-full px-3 py-3 bg-red-600/20 text-red-400 rounded-xl hover:bg-red-600/30 transition-all flex items-center justify-center border border-red-600/30"
                                                             title="Удалить товар"
-                                                            data-oid="lm_jt.q"
+                                                            data-oid="3hp4o4-"
                                                         >
                                                             🗑️
                                                         </button>
@@ -891,15 +891,15 @@ export default function Page() {
                                                 {/* Мобильная версия - показываем расчет */}
                                                 <div
                                                     className="lg:hidden mt-4 pt-4 border-t border-gray-600/50"
-                                                    data-oid="rzyfxre"
+                                                    data-oid="5c.j8e_"
                                                 >
                                                     <div
                                                         className="text-sm text-gray-400"
-                                                        data-oid="ur5n.mh"
+                                                        data-oid="wolgvvu"
                                                     >
                                                         {item.quantity > 0 &&
                                                             item.pricePerUnit > 0 && (
-                                                                <span data-oid="9xpdn-2">
+                                                                <span data-oid="inagn_6">
                                                                     {item.quantity} {item.unit} ×{' '}
                                                                     {item.pricePerUnit.toFixed(2)} ₽
                                                                     = {item.totalPrice.toFixed(2)} ₽
@@ -912,12 +912,12 @@ export default function Page() {
                                         {currentList.items.length === 0 && (
                                             <div
                                                 className="text-center py-12 text-gray-400"
-                                                data-oid="2mbpiu8"
+                                                data-oid="_tqyb6z"
                                             >
-                                                <div className="text-4xl mb-4" data-oid="36s5nug">
+                                                <div className="text-4xl mb-4" data-oid="v64ik3z">
                                                     📦
                                                 </div>
-                                                <div className="text-lg" data-oid="d:7xao0">
+                                                <div className="text-lg" data-oid="vqtkh-g">
                                                     Список пуст. Добавьте первый товар!
                                                 </div>
                                             </div>
@@ -928,23 +928,23 @@ export default function Page() {
                         ) : (
                             <div
                                 className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700/50 p-16 text-center"
-                                data-oid="saaftbi"
+                                data-oid="-p.c8y9"
                             >
-                                <div className="text-gray-400 mb-8" data-oid=":tap2zz">
-                                    <div className="text-6xl mb-4" data-oid="wi0t_ef">
+                                <div className="text-gray-400 mb-8" data-oid="_hzrk37">
+                                    <div className="text-6xl mb-4" data-oid="fkst0yd">
                                         📝
                                     </div>
-                                    <div className="text-xl text-white mb-2" data-oid="728.cz.">
+                                    <div className="text-xl text-white mb-2" data-oid="gh3kdy4">
                                         Создайте свой первый список продуктов
                                     </div>
-                                    <div className="text-gray-400" data-oid="q-4dt42">
+                                    <div className="text-gray-400" data-oid="hryj0je">
                                         Начните планировать покупки с умом
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setShowNewListModal(true)}
-                                    className="px-8 py-4 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl text-lg font-medium"
-                                    data-oid="yk7oplt"
+                                    className="px-3 py-4 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl text-lg font-medium"
+                                    data-oid="7_3t13m"
                                 >
                                     Создать список
                                 </button>
@@ -958,13 +958,13 @@ export default function Page() {
             {showNewListModal && (
                 <div
                     className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
-                    data-oid=".y2we93"
+                    data-oid="g.c22xt"
                 >
                     <div
-                        className="bg-gray-800 rounded-2xl p-8 w-full max-w-md mx-4 border border-gray-700/50"
-                        data-oid=":..q6cw"
+                        className="bg-gray-800 rounded-2xl py-8 px-3 w-full max-w-md mx-4 border border-gray-700/50"
+                        data-oid="3ue472:"
                     >
-                        <h3 className="text-xl font-semibold mb-6 text-white" data-oid="wu2_af9">
+                        <h3 className="text-xl font-semibold mb-6 text-white" data-oid="gvykwjb">
                             Создать новый список
                         </h3>
                         <input
@@ -975,14 +975,14 @@ export default function Page() {
                             onKeyPress={(e) => e.key === 'Enter' && createNewList()}
                             className="w-full px-4 py-3 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-6 bg-gray-700/50 text-white placeholder-gray-400 transition-all"
                             autoFocus
-                            data-oid="596fkig"
+                            data-oid="b1fg_ew"
                         />
 
-                        <div className="flex gap-3" data-oid="8wbt0:9">
+                        <div className="flex gap-3" data-oid="__nxsc1">
                             <button
                                 onClick={createNewList}
                                 className="flex-1 px-5 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all font-medium"
-                                data-oid="uij7tjx"
+                                data-oid="a8eo60m"
                             >
                                 Создать
                             </button>
@@ -992,7 +992,7 @@ export default function Page() {
                                     setNewListName('');
                                 }}
                                 className="flex-1 px-5 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-all"
-                                data-oid="9xw:lpq"
+                                data-oid="xzy628g"
                             >
                                 Отмена
                             </button>
