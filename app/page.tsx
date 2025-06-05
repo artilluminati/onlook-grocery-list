@@ -659,13 +659,6 @@ export default function Page() {
                                         >
                                             Товары
                                         </h3>
-                                        <button
-                                            onClick={addItem}
-                                            className="px-5 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
-                                            data-oid="loxvwqk"
-                                        >
-                                            + Добавить товар
-                                        </button>
                                     </div>
 
                                     <div className="space-y-4" data-oid="3fqe.oo">
@@ -922,6 +915,16 @@ export default function Page() {
                                                 </div>
                                             </div>
                                         )}
+
+                                        <div className="flex justify-center" data-oid="xth_pu_">
+                                            <button
+                                                onClick={addItem}
+                                                className="px-5 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl font-medium"
+                                                data-oid="1b8befl"
+                                            >
+                                                + Добавить товар
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
